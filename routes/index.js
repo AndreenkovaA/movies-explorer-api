@@ -1,19 +1,25 @@
 const router = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
 const { createUser, login } = require('../controllers/users');
+const auth = require('../middlewares/auth');
+const userRouter = require('./users');
+const movieRouter = require('./movies');
+const NotFoundError = require('../errors/not-found-err');
+const { validationSignIn, validationSignUp } = require('../middlewares/validation');
+const { NOT_FOUND, CRASH_TEST_ERROR } = require('../utils/constants');
 
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error(CRASH_TEST_ERROR);
+  }, 0);
+});
+
+router.post('/signin', validationSignIn, login);
+router.post('/signup', validationSignUp, createUser);
+
+router.use(auth);
+router.use(userRouter);
+router.use(movieRouter);
+
+router.use(() => { throw new NotFoundError(NOT_FOUND); });
 
 module.exports = router;

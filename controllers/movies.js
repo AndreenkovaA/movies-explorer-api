@@ -2,9 +2,12 @@ const Movie = require('../models/movie');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const ForbiddenError = require('../errors/forbidden-err');
+const {
+  MOVIE_WRONG_DATA, MOT_FOUND_MOVIE, MOVIE_FORBID_ACCESS,
+} = require('../utils/constants');
 
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .then((movies) => res.send({ data: movies.reverse() }))
     .catch(next);
 };
@@ -33,7 +36,7 @@ module.exports.createMovie = (req, res, next) => {
     .then((movie) => res.status(201).send({ data: movie }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        const e = new BadRequestError('Переданы некорректные данные при создании фильма.');
+        const e = new BadRequestError(MOVIE_WRONG_DATA);
         next(e);
       } else {
         next(err);
@@ -52,16 +55,16 @@ module.exports.deleteMovie = (req, res, next) => {
             })
             .catch(next);
         } else {
-          const err = new ForbiddenError('Фильм Вам не принадлежит.');
+          const err = new ForbiddenError(MOVIE_FORBID_ACCESS);
           next(err);
         }
       } else {
-        throw new NotFoundError('Фильм с указанным _id не найден.');
+        throw new NotFoundError(MOT_FOUND_MOVIE);
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        const e = new BadRequestError('Фильм с указанным _id не найден.');
+        const e = new BadRequestError(MOT_FOUND_MOVIE);
         next(e);
       } else {
         next(err);

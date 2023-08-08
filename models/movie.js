@@ -1,7 +1,6 @@
 const { ObjectId } = require('mongoose');
 const mongoose = require('mongoose');
-
-const LINK = /https?:\/\/(www\.)?[\w+\-./:?#[\]$&'()*+@,;=~!]{1,256}\.[a-zA-Z0-9()]{1,6}\b([\w+\-./:?#[\]$&'()*+@,;=~!]+)/;
+const LINK = require('../utils/constants');
 
 const movieSchema = new mongoose.Schema({
   country: {

@@ -4,3 +4,9 @@
 В этой части созданы схемы и модели ресурсов API, роуты и контроллеры, пеализована аутентификация, авторизация и логирование.
 
 Адрес репозитория: https://github.com/AndreenkovaA/movies-explorer-api
+
+## Ссылки на проект
+
+IP 158.160.103.53
+
+Backend https://api.diplom.back.nomoreparties.co

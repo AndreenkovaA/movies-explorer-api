@@ -10,11 +10,11 @@ const NotFoundError = require('./errors/not-found-err');
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3000 } = process.env;
+const { DATABASE = 'mongodb://127.0.0.1:27017/bitfilmsdb', PORT = 3000 } = process.env;
 
 const app = express();
 
-mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb', {
+mongoose.connect(DATABASE, {
   useNewUrlParser: true,
 });
 
@@ -23,12 +23,11 @@ app.use(express.json());
 app.use(requestLogger);
 
 const allowedCors = [
-  'https://mesto.front.nomoredomains.xyz',
-  'http://mesto.front.nomoredomains.xyz',
+  'https://diplom.front.nomoreparties.co',
+  'http://diplom.front.nomoreparties.co',
   'localhost:3000',
 ];
 
-// eslint-disable-next-line consistent-return
 app.use((req, res, next) => {
   const { origin } = req.headers;
   if (allowedCors.includes(origin)) {
@@ -47,7 +46,7 @@ app.use((req, res, next) => {
     return res.end();
   }
 
-  next();
+  return next();
 });
 
 app.get('/crash-test', () => {
@@ -66,8 +65,7 @@ app.use(() => { throw new NotFoundError('Страница не найдена.')
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, _next) => {
+app.use((err, _req, res, next) => {
   const { statusCode = 500, message } = err;
 
   res
@@ -77,6 +75,8 @@ app.use((err, req, res, _next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
+
+  return next();
 });
 
 app.listen(PORT, () => {

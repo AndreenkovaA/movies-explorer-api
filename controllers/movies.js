@@ -33,7 +33,7 @@ module.exports.createMovie = (req, res, next) => {
     .then((movie) => res.status(201).send({ data: movie }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        const e = new BadRequestError('Переданы некорректные данные при создании карточки.');
+        const e = new BadRequestError('Переданы некорректные данные при создании фильма.');
         next(e);
       } else {
         next(err);
@@ -42,7 +42,7 @@ module.exports.createMovie = (req, res, next) => {
 };
 
 module.exports.deleteMovie = (req, res, next) => {
-  Movie.findById(req.params.cardId)
+  Movie.findById(req.params._id)
     .then((movie) => {
       if (movie) {
         if (movie.owner.toString() === req.user._id) {
@@ -52,16 +52,16 @@ module.exports.deleteMovie = (req, res, next) => {
             })
             .catch(next);
         } else {
-          const err = new ForbiddenError('Карточка Вам не принадлежит.');
+          const err = new ForbiddenError('Фильм Вам не принадлежит.');
           next(err);
         }
       } else {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
+        throw new NotFoundError('Фильм с указанным _id не найден.');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        const e = new BadRequestError('Карточка с указанным _id не найдена.');
+        const e = new BadRequestError('Фильм с указанным _id не найден.');
         next(e);
       } else {
         next(err);
